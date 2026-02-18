@@ -1,131 +1,160 @@
 package org.orangehrm.actiondriver;
 
-import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.orangehrm.base.BaseClass;
-
+import org.apache.logging.log4j.Logger;
 
 import java.time.Duration;
-import java.util.Properties;
 
 public class ActionDriver {
 
-    private WebDriver driver;
-    private WebDriverWait wait;
+    private final WebDriver driver;
+    private final WebDriverWait wait;
+    private static final Logger logger = BaseClass.logger;
 
     public ActionDriver(WebDriver driver) {
         this.driver = driver;
 
         int explicitWait = Integer.parseInt(BaseClass.getProp().getProperty("explicitWait"));
         this.wait = new WebDriverWait(driver, Duration.ofSeconds(explicitWait));
+
+        logger.info("ActionDriver initialized with explicit wait: {} seconds", explicitWait);
     }
 
-    //Method to click an element
-    public void click(By by){
+    // Click element
+    public void click(By by) {
         try {
             waitForElementToBeClickable(by);
             driver.findElement(by).click();
+            logger.debug("Clicked on element: {}", by);
+
         } catch (Exception e) {
-            throw new RuntimeException("Unable to click: "+by,e);
+            logger.error("Failed to click element: {}", by, e);
+            throw new RuntimeException("Click failed for: " + by, e);
         }
     }
 
-    //Method to enter text into an input field
-    public void enterText(By by, String value){
+    // Enter text
+    public void enterText(By by, String value) {
         try {
             waitForElementToBeVisible(by);
             WebElement element = driver.findElement(by);
             element.clear();
             element.sendKeys(value);
+
+            logger.debug("Entered text into element: {}", by);
+
         } catch (Exception e) {
-            throw new RuntimeException("Unable to enter text: "+value, e);
+            logger.error("Failed to enter text '{}' into element: {}", value, by, e);
+            throw new RuntimeException("Enter text failed for: " + by, e);
         }
     }
 
-    //Method to get text from an input field
-    public String getText(By by){
+    // Get text
+    public String getText(By by) {
         try {
             waitForElementToBeVisible(by);
-            return driver.findElement(by).getText();
+            String text = driver.findElement(by).getText();
+
+            logger.debug("Text from {} is '{}'", by, text);
+            return text;
+
         } catch (Exception e) {
-            throw new RuntimeException("Unable to get text: "+ by, e);
+            logger.error("Failed to get text from element: {}", by, e);
+            throw new RuntimeException("Get text failed for: " + by, e);
         }
     }
 
-    //Method to compare Two Text
-    public boolean compareText(By by, String expectedText){
+    // Compare text
+    public boolean compareText(By by, String expectedText) {
         try {
             waitForElementToBeVisible(by);
             String actualText = driver.findElement(by).getText();
-            if (expectedText.equals(actualText)){
-                System.out.println("Text are Matching: "+actualText + "=" + expectedText);
-                return true;
-            }
-            else {
-                System.out.println("Text are not equals: "+actualText + "!=" + expectedText);
-                return false;
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("Unable to compare Texts: "+by,e);
-        }
 
+            boolean match = expectedText.equals(actualText);
+
+            if (match) {
+                logger.info("Text matches. Expected='{}', Actual='{}'", expectedText, actualText);
+            } else {
+                logger.warn("Text mismatch. Expected='{}', Actual='{}'", expectedText, actualText);
+            }
+
+            return match;
+
+        } catch (Exception e) {
+            logger.error("Failed to compare text for element: {}", by, e);
+            throw new RuntimeException("Compare text failed for: " + by, e);
+        }
     }
 
-    //Method to check if an element is displayed
-    public boolean isDisplayed(By by){
+    // Check displayed
+    public boolean isDisplayed(By by) {
         try {
             waitForElementToBeVisible(by);
             return driver.findElement(by).isDisplayed();
+
+        } catch (TimeoutException e) {
+            logger.warn("Element not displayed within wait time: {}", by);
+            return false;
+
         } catch (Exception e) {
+            logger.error("Error checking display status for: {}", by, e);
             return false;
         }
     }
 
-
-
-
-
-    //Wait the page to be loaded
-    public void waitForPageLoad(int timeOutInSecs)  {
+    // Wait for page load
+    public void waitForPageLoad(int timeoutInSecs) {
         try {
-            wait.withTimeout(Duration.ofSeconds(timeOutInSecs)).until(WebDriver -> ((JavascriptExecutor) WebDriver))
-                    .executeScript("return document.readyState").equals("complete");
+            new WebDriverWait(driver, Duration.ofSeconds(timeoutInSecs))
+                    .until(d -> ((JavascriptExecutor) d)
+                            .executeScript("return document.readyState")
+                            .equals("complete"));
+
+            logger.debug("Page loaded successfully");
+
         } catch (Exception e) {
-            throw new RuntimeException("Page did not load within "+timeOutInSecs + "seconds. Exception: "+e.getMessage());
+            logger.error("Page did not load within {} seconds", timeoutInSecs, e);
+            throw new RuntimeException("Page load timeout", e);
         }
     }
 
-    //Scroll to an element
-    public void scrollToElement(By by){
+    // Scroll to element
+    public void scrollToElement(By by) {
         try {
-            JavascriptExecutor js = (JavascriptExecutor) driver;
             WebElement element = driver.findElement(by);
-            js.executeScript("arguments[0],scrollIntoView(true);", element);
+            ((JavascriptExecutor) driver)
+                    .executeScript("arguments[0].scrollIntoView(true);", element);
+
+            logger.debug("Scrolled to element: {}", by);
+
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            logger.error("Failed to scroll to element: {}", by, e);
+            throw new RuntimeException("Scroll failed for: " + by, e);
         }
     }
 
-
-    //Wait for element to be clickable
-    private void waitForElementToBeClickable(By by){
+    // Wait clickable
+    private void waitForElementToBeClickable(By by) {
         try {
             wait.until(ExpectedConditions.elementToBeClickable(by));
+
         } catch (Exception e) {
-            throw new RuntimeException("Element is not clickeable: "+e.getMessage());
+            logger.error("Element not clickable: {}", by, e);
+            throw new RuntimeException("Element not clickable: " + by, e);
         }
     }
 
-    //Wait for Element to be Visible
-    private void waitForElementToBeVisible(By by){
+    // Wait visible
+    private void waitForElementToBeVisible(By by) {
         try {
             wait.until(ExpectedConditions.visibilityOfElementLocated(by));
+
         } catch (Exception e) {
-            throw new RuntimeException("Element is not visible: "+e.getMessage());
+            logger.error("Element not visible: {}", by, e);
+            throw new RuntimeException("Element not visible: " + by, e);
         }
     }
 }

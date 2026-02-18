@@ -1,1 +1,80 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+
+    <Properties>
+        <Property name="logDir">logs</Property>
+
+
+        <Property name="pattern">
+            %d{yyyy-MM-dd HH:mm:ss} [%t] %-5level %c{1} - %msg%n
+        </Property>
+    </Properties>
+
+    <Appenders>
+
+        <!-- Console Logger -->
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="${pattern}"/>
+        </Console>
+
+        <!-- Rolling File -->
+        <RollingFile name="FileLogger"
+                     fileName="${logDir}/app.log"
+                     filePattern="${logDir}/app-%d{yyyy-MM-dd}-%i.log.gz">
+
+            <PatternLayout pattern="${pattern}"/>
+
+            <Policies>
+
+                <TimeBasedTriggeringPolicy interval="1"/>
+
+
+                <SizeBasedTriggeringPolicy size="10 MB"/>
+            </Policies>
+
+
+            <DefaultRolloverStrategy max="30"/>
+        </RollingFile>
+
+        <!-- Rolling File -->
+        <RollingFile name="ErrorLogger"
+                     fileName="${logDir}/error.log"
+                     filePattern="${logDir}/error-%d{yyyy-MM-dd}-%i.log.gz">
+
+            <PatternLayout pattern="${pattern}"/>
+
+            <Filters>
+                <ThresholdFilter level="error"
+                                 onMatch="ACCEPT"
+                                 onMismatch="DENY"/>
+            </Filters>
+
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1"/>
+                <SizeBasedTriggeringPolicy size="10 MB"/>
+            </Policies>
+
+            <DefaultRolloverStrategy max="30"/>
+        </RollingFile>
+
+    </Appenders>
+
+    <Loggers>
+
+
+        <Logger name="org.orangehrm" level="debug" additivity="false">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="FileLogger"/>
+            <AppenderRef ref="ErrorLogger"/>
+        </Logger>
+
+        <!-- ROOT LOGGER -->
+        <Root level="info">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="FileLogger"/>
+            <AppenderRef ref="ErrorLogger"/>
+        </Root>
+
+    </Loggers>
+
+</Configuration>

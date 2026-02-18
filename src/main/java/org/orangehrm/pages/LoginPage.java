@@ -11,7 +11,7 @@ public class LoginPage {
     // Locators using By
     private final By userNameField = By.name("username");
     private final By passwordField = By.name("password");
-    private final By loginButton = By.xpath("//button[text()='Login']");
+    private final By loginButton = By.xpath("//button[@type='submit']");
     private final By errorMessage = By.xpath("//p[text()='Invalid credentials']");
 
     // Constructor
