@@ -4,6 +4,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.orangehrm.actiondriver.ActionDriver;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeSuite;
@@ -21,6 +22,7 @@ public class BaseClass {
 
     protected static Properties prop;
     protected static WebDriver driver;
+    private static ActionDriver actionDriver;
 
 
     @BeforeSuite
@@ -36,6 +38,11 @@ public class BaseClass {
         launchBrowser();
         configureBrowser();
         staticWait(5);
+
+        //Initialize the actionDriver
+        if (actionDriver == null){
+            actionDriver = new ActionDriver(driver);
+        }
 
     }
 
@@ -85,13 +92,26 @@ public class BaseClass {
                 System.out.println("Unable to quit the driver"+e.getMessage());
             }
         }
+        driver = null;
+        actionDriver = null;
     }
 
     public void staticWait(int seconds){
         LockSupport.parkNanos(TimeUnit.SECONDS.toNanos(seconds));
     }
 
-    public WebDriver getDriver(){
+
+    public static ActionDriver getActionDriver(){
+        if (actionDriver == null){
+            throw new IllegalStateException("WebDriver is not initialized");
+        }
+        return actionDriver;
+    }
+
+    public static WebDriver getDriver() {
+        if (driver == null){
+            throw new IllegalStateException("WebDriver is not initialized");
+        }
         return driver;
     }
 

@@ -3,6 +3,7 @@ package org.orangehrm.pages;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.orangehrm.actiondriver.ActionDriver;
+import org.orangehrm.base.BaseClass;
 
 public class LoginPage {
 
@@ -15,7 +16,7 @@ public class LoginPage {
 
     // Constructor
     public LoginPage(WebDriver driver){
-        this.actionDriver = new ActionDriver(driver);
+        this.actionDriver = BaseClass.getActionDriver();
     }
     // Business methods
     public void login(String userName, String password){

@@ -3,20 +3,21 @@ package org.orangehrm.pages;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.orangehrm.actiondriver.ActionDriver;
+import org.orangehrm.base.BaseClass;
 
 public class HomePage {
 
     private final ActionDriver actionDriver;
 
     //Define locators using By
-    private By adminTab = By.xpath("//span[text()='Admin']");
-    private By userIDButton = By.className("oxd-userdropdown-name");
-    private By logoutButton = By.xpath("//a[text()='Logout']");
-    private By orangeHRMLogo = By.xpath("//div[@class='oxd-brand-banner']//img");
+    private final By adminTab = By.xpath("//span[text()='Admin']");
+    private final By userIDButton = By.className("oxd-userdropdown-name");
+    private final By logoutButton = By.xpath("//a[text()='Logout']");
+    private final By orangeHRMLogo = By.xpath("//div[@class='oxd-brand-banner']//img");
 
     //Constructor
     public HomePage(WebDriver driver){
-        this.actionDriver = new ActionDriver(driver);
+        this.actionDriver = BaseClass.getActionDriver();
     }
 
     public boolean isAdminTabVisible(){
