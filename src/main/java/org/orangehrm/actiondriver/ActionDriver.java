@@ -25,14 +25,15 @@ public class ActionDriver {
 
     // Click element
     public void click(By by) {
+        String elementDescription = getElementDescription(by);
         try {
             waitForElementToBeClickable(by);
             driver.findElement(by).click();
-            logger.debug("Clicked on element: {}", by);
+            logger.debug("Clicked on element: {}", elementDescription);
 
         } catch (Exception e) {
-            logger.error("Failed to click element: {}", by, e);
-            throw new RuntimeException("Click failed for: " + by, e);
+            logger.error("Failed to click element: {}", elementDescription, e);
+            throw new RuntimeException("Click failed for: " + elementDescription, e);
         }
     }
 
@@ -44,10 +45,10 @@ public class ActionDriver {
             element.clear();
             element.sendKeys(value);
 
-            logger.debug("Entered text into element: {}", by);
+            logger.debug("Entered text into element: {}", getElementDescription(by) + value);
 
         } catch (Exception e) {
-            logger.error("Failed to enter text '{}' into element: {}", value, by, e);
+            logger.error("Failed to enter text '{}' into element: {}", value, getElementDescription(by), e);
             throw new RuntimeException("Enter text failed for: " + by, e);
         }
     }
@@ -93,6 +94,7 @@ public class ActionDriver {
     public boolean isDisplayed(By by) {
         try {
             waitForElementToBeVisible(by);
+            logger.info("Element is displayed" + getElementDescription(by));
             return driver.findElement(by).isDisplayed();
 
         } catch (TimeoutException e) {
@@ -157,4 +159,67 @@ public class ActionDriver {
             throw new RuntimeException("Element not visible: " + by, e);
         }
     }
+
+    //Method to get the description of an element using By locator
+
+    public String getElementDescription(By locator){
+        //Check for null driver or locator to avoid NullPointer Exception
+        if (driver == null)
+            return "driver is null";
+        if (locator == null)
+            return "Locator is null";
+
+        //Find the element using the locator
+        WebElement element = driver.findElement(locator);
+
+        try {
+            //Get element attributes
+            String name =  element.getDomAttribute("name");
+            String id = element.getDomAttribute("id");
+            String text = element.getText();
+            String className = element.getDomAttribute("class");
+            String placeHolder = element.getDomAttribute("placeholder");
+
+            //Return the description based on element attributed
+            //Return the description based on element attributes
+            if (isNotEmpty(name)) {
+                return "Element with name: " + name;
+            }
+            else if (isNotEmpty(id)) {
+                return "Element with id: " + id;
+            }
+            else if (isNotEmpty(text)) {
+                return "Element with text: " + truncate(text, 50);
+            }
+            else if (isNotEmpty(className)) {
+                return "Element with class: " + className;
+            }
+            else if (isNotEmpty(placeHolder)) {
+                return "Element with placeholder: " + placeHolder;
+            }
+            else {
+                return "Element without identifiable attributes";
+            }
+        } catch (Exception e) {
+            logger.error("Unable to describe the element",e);
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    //TODO
+    //Create an StringChecker class in utils
+    //Utility Method to check a String is not null or empty
+    private boolean isNotEmpty(String value){
+        return value != null && !value.isEmpty();
+    }
+
+    //Utility Method to truncate long string
+    private String truncate(String value, int maxLength){
+        if (value == null || value.length()<= maxLength){
+            return value;
+        }
+        return value.substring(0,maxLength);
+    }
+
 }
