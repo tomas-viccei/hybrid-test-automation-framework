@@ -1,0 +1,32 @@
+2026-02-18 13:14:57 [main] INFO  Utils - [TestNG] Running:
+  /Users/tomasviccei/IdeaProjects/selenium_framework_try/src/test/resources/testng.xml
+
+2026-02-18 13:14:57 [main] INFO  LoggerManager - Config.properties loaded successfully
+2026-02-18 13:14:57 [main] INFO  LoggerManager - === Test setup started for LoginPageTest ===
+2026-02-18 13:14:59 [main] INFO  LoggerManager - ChromeDriver initialized
+2026-02-18 13:15:02 [main] INFO  LoggerManager - Navigated to URL: https://opensource-demo.orangehrmlive.com/web/index.php/auth/login
+2026-02-18 13:15:02 [main] DEBUG LoggerManager - Static wait for 2 seconds
+2026-02-18 13:15:04 [main] INFO  LoggerManager - ActionDriver initialized with explicit wait: 30 seconds
+2026-02-18 13:15:04 [main] INFO  LoggerManager - Test setup completed
+2026-02-18 13:15:04 [main] DEBUG LoggerManager - Entered text into element: By.name: username
+2026-02-18 13:15:04 [main] DEBUG LoggerManager - Entered text into element: By.name: password
+2026-02-18 13:15:04 [main] DEBUG LoggerManager - Clicked on element: By.xpath: //button[@type='submit']
+2026-02-18 13:15:08 [main] INFO  LoggerManager - Text matches. Expected='Invalid credentials', Actual='Invalid credentials'
+2026-02-18 13:15:08 [main] INFO  LoggerManager - === Test teardown started ===
+2026-02-18 13:15:08 [main] INFO  LoggerManager - Browser closed successfully
+2026-02-18 13:15:08 [main] INFO  LoggerManager - Teardown completed
+2026-02-18 13:15:08 [main] INFO  LoggerManager - === Test setup started for LoginPageTest ===
+2026-02-18 13:15:08 [main] INFO  LoggerManager - ChromeDriver initialized
+2026-02-18 13:15:11 [main] INFO  LoggerManager - Navigated to URL: https://opensource-demo.orangehrmlive.com/web/index.php/auth/login
+2026-02-18 13:15:11 [main] DEBUG LoggerManager - Static wait for 2 seconds
+2026-02-18 13:15:13 [main] INFO  LoggerManager - ActionDriver initialized with explicit wait: 30 seconds
+2026-02-18 13:15:13 [main] INFO  LoggerManager - Test setup completed
+2026-02-18 13:15:13 [main] DEBUG LoggerManager - Entered text into element: By.name: username
+2026-02-18 13:15:13 [main] DEBUG LoggerManager - Entered text into element: By.name: password
+2026-02-18 13:15:15 [main] DEBUG LoggerManager - Clicked on element: By.xpath: //button[@type='submit']
+2026-02-18 13:15:16 [main] DEBUG LoggerManager - Clicked on element: By.className: oxd-userdropdown-name
+2026-02-18 13:15:20 [main] DEBUG LoggerManager - Clicked on element: By.xpath: //a[text()='Logout']
+2026-02-18 13:15:20 [main] DEBUG LoggerManager - Static wait for 2 seconds
+2026-02-18 13:15:22 [main] INFO  LoggerManager - === Test teardown started ===
+2026-02-18 13:15:22 [main] INFO  LoggerManager - Browser closed successfully
+2026-02-18 13:15:22 [main] INFO  LoggerManager - Teardown completed

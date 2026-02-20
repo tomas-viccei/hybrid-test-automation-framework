@@ -21,8 +21,10 @@ import java.util.concurrent.locks.LockSupport;
 public class BaseClass {
 
     protected static Properties prop;
-    protected static WebDriver driver;
-    private static ActionDriver actionDriver;
+
+    // ThreadLocal instances
+    private static final ThreadLocal<WebDriver> driver = new ThreadLocal<>();
+    private static final ThreadLocal<ActionDriver> actionDriver = new ThreadLocal<>();
 
     public static final Logger logger =
             LoggerManager.getLogger(BaseClass.class);
@@ -30,13 +32,14 @@ public class BaseClass {
     // Load config
     @BeforeSuite
     public void loadConfig() {
+
         prop = new Properties();
 
         try (FileInputStream fis =
                      new FileInputStream("src/main/resources/config.properties")) {
 
             prop.load(fis);
-            logger.info("Config.properties loaded successfully");
+            logger.info("config.properties loaded successfully");
 
         } catch (IOException e) {
             logger.fatal("Failed to load config.properties", e);
@@ -46,8 +49,9 @@ public class BaseClass {
 
     // Setup
     @BeforeMethod
-    public void setUp() {
-        logger.info("=== Test setup started for {} ===",
+    public synchronized void setUp() {
+
+        logger.info("--- Test setup started for {} ---",
                 this.getClass().getSimpleName());
 
         launchBrowser();
@@ -55,31 +59,33 @@ public class BaseClass {
 
         staticWait(2);
 
-        if (actionDriver == null) {
-            actionDriver = new ActionDriver(driver);
-        }
+        // Initialize ActionDriver for current thread
+        actionDriver.set(new ActionDriver(getDriver()));
 
         logger.info("Test setup completed");
     }
 
-    // Browser init
-    private void launchBrowser() {
+    // Browser initialization
+    private synchronized void launchBrowser() {
+
         String browser = prop.getProperty("browser");
 
         try {
+
             switch (browser.toLowerCase()) {
+
                 case "chrome":
-                    driver = new ChromeDriver();
+                    driver.set(new ChromeDriver());
                     logger.info("ChromeDriver initialized");
                     break;
 
                 case "firefox":
-                    driver = new FirefoxDriver();
+                    driver.set(new FirefoxDriver());
                     logger.info("FirefoxDriver initialized");
                     break;
 
                 case "edge":
-                    driver = new EdgeDriver();
+                    driver.set(new EdgeDriver());
                     logger.info("EdgeDriver initialized");
                     break;
 
@@ -94,19 +100,22 @@ public class BaseClass {
         }
     }
 
-    // Browser config
+
+    // Browser configuration
     private void configureBrowser() {
+
         try {
+
             int implicitWait =
                     Integer.parseInt(prop.getProperty("implicitWait"));
 
-            driver.manage().timeouts()
+            getDriver().manage().timeouts()
                     .implicitlyWait(Duration.ofSeconds(implicitWait));
 
-            driver.manage().window().maximize();
+            getDriver().manage().window().maximize();
 
             String url = prop.getProperty("url");
-            driver.navigate().to(url);
+            getDriver().navigate().to(url);
 
             logger.info("Navigated to URL: {}", url);
 
@@ -116,55 +125,67 @@ public class BaseClass {
         }
     }
 
+
     // Tear down
+
     @AfterMethod
-    public void tearDown() {
-        logger.info("=== Test teardown started ===");
+    public synchronized void tearDown() {
 
-        if (driver != null) {
-            try {
-                driver.quit();
+        logger.info("--- Test teardown started ---");
+
+        try {
+
+            if (driver.get() != null) {
+                driver.get().quit();
                 logger.info("Browser closed successfully");
-
-            } catch (Exception e) {
-                logger.error("Error while quitting driver", e);
             }
-        }
 
-        driver = null;
-        actionDriver = null;
+        } catch (Exception e) {
+            logger.error("Error while quitting driver", e);
+
+        } finally {
+
+            // Prevent memory leaks in parallel execution
+            driver.remove();
+            actionDriver.remove();
+        }
 
         logger.info("Teardown completed");
     }
 
-    // Static wait (avoid when possible)
+
+    // Static wait (avoid if possible)
+
     public void staticWait(int seconds) {
+
         logger.debug("Static wait for {} seconds", seconds);
         LockSupport.parkNanos(TimeUnit.SECONDS.toNanos(seconds));
     }
 
+
     // Getters
-    public static ActionDriver getActionDriver() {
-        if (actionDriver == null) {
-            throw new IllegalStateException(
-                    "ActionDriver not initialized");
-        }
-        return actionDriver;
-    }
 
     public static WebDriver getDriver() {
-        if (driver == null) {
+
+        if (driver.get() == null) {
             throw new IllegalStateException(
                     "WebDriver not initialized");
         }
-        return driver;
+
+        return driver.get();
+    }
+
+    public static ActionDriver getActionDriver() {
+
+        if (actionDriver.get() == null) {
+            throw new IllegalStateException(
+                    "ActionDriver not initialized");
+        }
+
+        return actionDriver.get();
     }
 
     public static Properties getProp() {
         return prop;
-    }
-
-    public void setDriver(WebDriver driver) {
-        BaseClass.driver = driver;
     }
 }
