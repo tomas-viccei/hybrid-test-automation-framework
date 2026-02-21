@@ -5,6 +5,7 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.orangehrm.actiondriver.ActionDriver;
+import org.orangehrm.utils.ExtentManager;
 import org.orangehrm.utils.LoggerManager;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
@@ -45,6 +46,10 @@ public class BaseClass {
             logger.fatal("Failed to load config.properties", e);
             throw new RuntimeException("Config file not found", e);
         }
+
+        ExtentManager.getReporter();
+
+
     }
 
     // Setup
@@ -76,16 +81,19 @@ public class BaseClass {
 
                 case "chrome":
                     driver.set(new ChromeDriver());
+                    ExtentManager.registerDriver(getDriver());
                     logger.info("ChromeDriver initialized");
                     break;
 
                 case "firefox":
                     driver.set(new FirefoxDriver());
+                    ExtentManager.registerDriver(getDriver());
                     logger.info("FirefoxDriver initialized");
                     break;
 
                 case "edge":
                     driver.set(new EdgeDriver());
+                    ExtentManager.registerDriver(getDriver());
                     logger.info("EdgeDriver initialized");
                     break;
 
@@ -148,6 +156,7 @@ public class BaseClass {
             // Prevent memory leaks in parallel execution
             driver.remove();
             actionDriver.remove();
+            ExtentManager.endTest();
         }
 
         logger.info("Teardown completed");

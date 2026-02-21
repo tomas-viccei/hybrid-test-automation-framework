@@ -5,6 +5,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.orangehrm.base.BaseClass;
 import org.apache.logging.log4j.Logger;
+import org.orangehrm.utils.ExtentManager;
 
 import java.time.Duration;
 
@@ -29,9 +30,11 @@ public class ActionDriver {
         try {
             waitForElementToBeClickable(by);
             driver.findElement(by).click();
+            ExtentManager.logStep("Clicked an element: "+elementDescription);
             logger.debug("Clicked on element: {}", elementDescription);
 
         } catch (Exception e) {
+            ExtentManager.logFailure(BaseClass.getDriver(), "Unable to click element", elementDescription + "_unable to click");
             logger.error("Failed to click element: {}", elementDescription, e);
             throw new RuntimeException("Click failed for: " + elementDescription, e);
         }
@@ -77,8 +80,10 @@ public class ActionDriver {
             boolean match = expectedText.equals(actualText);
 
             if (match) {
+                ExtentManager.logStepWithScreenshot(BaseClass.getDriver(),"Compare Text","Text verified successfully!: Expected = "+"'"+expectedText+"'"+" Actual = "+"'"+actualText+"'");
                 logger.info("Text matches. Expected='{}', Actual='{}'", expectedText, actualText);
             } else {
+                ExtentManager.logFailure(BaseClass.getDriver(),"Compare Text","Text Comparison failed: Expected = "+"'"+expectedText+"'"+" Actual = "+"'"+actualText+"'");
                 logger.warn("Text mismatch. Expected='{}', Actual='{}'", expectedText, actualText);
             }
 
@@ -94,6 +99,7 @@ public class ActionDriver {
     public boolean isDisplayed(By by) {
         try {
             waitForElementToBeVisible(by);
+            ExtentManager.logStep("Element is displayed "+ getElementDescription(by));
             logger.info("Element is displayed" + getElementDescription(by));
             return driver.findElement(by).isDisplayed();
 
@@ -102,6 +108,7 @@ public class ActionDriver {
             return false;
 
         } catch (Exception e) {
+            ExtentManager.logFailure(BaseClass.getDriver(), "Element is not displayed", "Element is not displayed: "+ getElementDescription(by) );
             logger.error("Error checking display status for: {}", by, e);
             return false;
         }
