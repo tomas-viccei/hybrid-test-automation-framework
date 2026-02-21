@@ -1,9 +1,8 @@
 package com.orangehrm.test;
 
-import org.orangehrm.base.BaseClass;
-import org.orangehrm.pages.HomePage;
-import org.orangehrm.pages.LoginPage;
-import org.orangehrm.utils.ExtentManager;
+import com.orangehrm.base.BaseClass;
+import com.orangehrm.pages.HomePage;
+import com.orangehrm.pages.LoginPage;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -21,28 +20,26 @@ public class LoginPageTest extends BaseClass {
 
     @Test
     public void verifyValidLoginTest(){
-        ExtentManager.startTest("Valid login test");
-        ExtentManager.logStep("Navigating to Login Page entering username and password");
 
-        loginPage.login("admin","admin123");
-        ExtentManager.logStep("Verifying Admin tab is visible or not");
-        Assert.assertTrue(homePage.isAdminTabVisible(),"Admin tab should be visible after successful login");
+        loginPage.login("admin", "admin123");
 
-        ExtentManager.logStep("Validation Successful");
+        Assert.assertTrue(
+                homePage.isAdminTabVisible(),
+                "Admin tab should be visible after successful login"
+        );
+
         homePage.logout();
-        ExtentManager.logStep("Logged out Successfully");
         staticWait(2);
     }
 
     @Test
     public void invalidLoginTest(){
 
-        ExtentManager.startTest("invalid login test");
-        ExtentManager.logStep("Navigating to Login Page entering invalid username and password");
         loginPage.login("admin", "notthispass");
-        String expectedErrorMessage = "Invalid credentials";
-        Assert.assertTrue(loginPage.verifyErrorMessage(expectedErrorMessage),"Test Failed: invalid error message");
-        ExtentManager.logStep("Validation Successful");
-        ExtentManager.logStep("Logged Out");
+
+        Assert.assertTrue(
+                loginPage.verifyErrorMessage("Invalid credentials"),
+                "Invalid error message"
+        );
     }
 }

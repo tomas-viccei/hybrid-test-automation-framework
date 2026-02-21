@@ -1,12 +1,12 @@
-package org.orangehrm.base;
+package com.orangehrm.base;
 
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
-import org.orangehrm.actiondriver.ActionDriver;
-import org.orangehrm.utils.ExtentManager;
-import org.orangehrm.utils.LoggerManager;
+import com.orangehrm.actiondriver.ActionDriver;
+import com.orangehrm.utils.ExtentManager;
+import com.orangehrm.utils.LoggerManager;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeSuite;
@@ -47,7 +47,7 @@ public class BaseClass {
             throw new RuntimeException("Config file not found", e);
         }
 
-        ExtentManager.getReporter();
+        //ExtentManager.getReporter();
 
 
     }
@@ -81,18 +81,21 @@ public class BaseClass {
 
                 case "chrome":
                     driver.set(new ChromeDriver());
+
                     ExtentManager.registerDriver(getDriver());
                     logger.info("ChromeDriver initialized");
                     break;
 
                 case "firefox":
                     driver.set(new FirefoxDriver());
+
                     ExtentManager.registerDriver(getDriver());
                     logger.info("FirefoxDriver initialized");
                     break;
 
                 case "edge":
                     driver.set(new EdgeDriver());
+
                     ExtentManager.registerDriver(getDriver());
                     logger.info("EdgeDriver initialized");
                     break;
@@ -156,7 +159,9 @@ public class BaseClass {
             // Prevent memory leaks in parallel execution
             driver.remove();
             actionDriver.remove();
-            ExtentManager.endTest();
+
+
+            //ExtentManager.endTest();
         }
 
         logger.info("Teardown completed");

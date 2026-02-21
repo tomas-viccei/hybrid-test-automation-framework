@@ -1,4 +1,4 @@
-package org.orangehrm.utils;
+package com.orangehrm.utils;
 
 import com.aventstack.extentreports.ExtentReports;
 import com.aventstack.extentreports.ExtentTest;

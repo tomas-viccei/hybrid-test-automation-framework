@@ -1,11 +1,11 @@
-package org.orangehrm.actiondriver;
+package com.orangehrm.actiondriver;
 
 import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
-import org.orangehrm.base.BaseClass;
+import com.orangehrm.base.BaseClass;
 import org.apache.logging.log4j.Logger;
-import org.orangehrm.utils.ExtentManager;
+import com.orangehrm.utils.ExtentManager;
 
 import java.time.Duration;
 
