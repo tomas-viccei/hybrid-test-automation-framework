@@ -29,11 +29,14 @@ public class ActionDriver {
         String elementDescription = getElementDescription(by);
         try {
             waitForElementToBeClickable(by);
+            applyBorder(by,"green");
             driver.findElement(by).click();
             ExtentManager.logStep("Clicked an element: "+elementDescription);
             logger.debug("Clicked on element: {}", elementDescription);
 
         } catch (Exception e) {
+
+            applyBorder(by,"red");
             ExtentManager.logFailure(BaseClass.getDriver(), "Unable to click element", elementDescription + "_unable to click");
             logger.error("Failed to click element: {}", elementDescription, e);
             throw new RuntimeException("Click failed for: " + elementDescription, e);
@@ -44,6 +47,7 @@ public class ActionDriver {
     public void enterText(By by, String value) {
         try {
             waitForElementToBeVisible(by);
+            applyBorder(by,"green");
             WebElement element = driver.findElement(by);
             element.clear();
             element.sendKeys(value);
@@ -51,6 +55,7 @@ public class ActionDriver {
             logger.debug("Entered text into element: {}", getElementDescription(by) + value);
 
         } catch (Exception e) {
+            applyBorder(by,"red");
             logger.error("Failed to enter text '{}' into element: {}", value, getElementDescription(by), e);
             throw new RuntimeException("Enter text failed for: " + by, e);
         }
@@ -66,6 +71,7 @@ public class ActionDriver {
             return text;
 
         } catch (Exception e) {
+            applyBorder(by,"red");
             logger.error("Failed to get text from element: {}", by, e);
             throw new RuntimeException("Get text failed for: " + by, e);
         }
@@ -80,9 +86,11 @@ public class ActionDriver {
             boolean match = expectedText.equals(actualText);
 
             if (match) {
+                applyBorder(by,"green");
                 ExtentManager.logStepWithScreenshot(BaseClass.getDriver(),"Compare Text","Text verified successfully!: Expected = "+"'"+expectedText+"'"+" Actual = "+"'"+actualText+"'");
                 logger.info("Text matches. Expected='{}', Actual='{}'", expectedText, actualText);
             } else {
+                applyBorder(by,"red");
                 ExtentManager.logFailure(BaseClass.getDriver(),"Compare Text","Text Comparison failed: Expected = "+"'"+expectedText+"'"+" Actual = "+"'"+actualText+"'");
                 logger.warn("Text mismatch. Expected='{}', Actual='{}'", expectedText, actualText);
             }
@@ -90,6 +98,7 @@ public class ActionDriver {
             return match;
 
         } catch (Exception e) {
+            applyBorder(by,"red");
             logger.error("Failed to compare text for element: {}", by, e);
             throw new RuntimeException("Compare text failed for: " + by, e);
         }
@@ -99,11 +108,13 @@ public class ActionDriver {
     public boolean isDisplayed(By by) {
         try {
             waitForElementToBeVisible(by);
+            applyBorder(by,"green");
             ExtentManager.logStep("Element is displayed "+ getElementDescription(by));
             logger.info("Element is displayed" + getElementDescription(by));
             return driver.findElement(by).isDisplayed();
 
         } catch (TimeoutException e) {
+            applyBorder(by,"red");
             logger.warn("Element not displayed within wait time: {}", by);
             return false;
 
@@ -133,6 +144,7 @@ public class ActionDriver {
     // Scroll to element
     public void scrollToElement(By by) {
         try {
+            applyBorder(by,"green");
             WebElement element = driver.findElement(by);
             ((JavascriptExecutor) driver)
                     .executeScript("arguments[0].scrollIntoView(true);", element);
@@ -140,6 +152,7 @@ public class ActionDriver {
             logger.debug("Scrolled to element: {}", by);
 
         } catch (Exception e) {
+            applyBorder(by,"red");
             logger.error("Failed to scroll to element: {}", by, e);
             throw new RuntimeException("Scroll failed for: " + by, e);
         }
@@ -229,4 +242,22 @@ public class ActionDriver {
         return value.substring(0,maxLength);
     }
 
+    //Utility method to Border an element
+
+    public void applyBorder(By locator, String color) {
+        try {
+            WebElement element = driver.findElement(locator);
+
+            JavascriptExecutor js = (JavascriptExecutor) driver;
+            js.executeScript(
+                    "arguments[0].style.border='3px solid " + color + "'",
+                    element
+            );
+
+            logger.info("Applied border '{}' to element: {}", color, getElementDescription(locator));
+
+        } catch (Exception e) {
+            logger.warn("Failed to apply border to element: {}", locator, e);
+        }
+    }
 }
